@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTech Pro - Premium Wealth Management</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bank-navy: #0B132B;
+            --bank-blue: #1C3D5A;
+            --premium-gold: #D4AF37;
+            --light-gold: #FBF8F1;
+            --success-green: #059669;
+            --danger-red: #DC2626;
+            --bg-body: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); -webkit-font-smoothing: antialiased; }
+
+        .navbar-premium { background: linear-gradient(90deg, var(--bank-navy) 0%, var(--bank-blue) 100%); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .navbar-brand { font-weight: 800; letter-spacing: 1px; color: #fff !important; }
+        
+        .card { border: none; border-radius: 16px; background-color: var(--card-bg); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); margin-bottom: 24px; overflow: hidden; }
+        .card-header { background-color: transparent; border-bottom: 1px solid #E5E7EB; font-weight: 700; color: var(--bank-navy); padding: 16px 24px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
+
+        .form-control, .form-select { border-radius: 8px; border: 1px solid #D1D5DB; padding: 8px 12px; font-size: 0.9rem; box-shadow: none !important; }
+        .form-control:focus, .form-select:focus { border-color: var(--bank-blue); }
+        .btn { border-radius: 8px; font-weight: 600; font-size: 0.9rem; letter-spacing: 0.3px; padding: 8px 16px; }
+        .btn-bank { background-color: var(--bank-navy); color: white; }
+        .btn-bank:hover { background-color: var(--bank-blue); color: white; }
+        
+        .grand-total-card { background: linear-gradient(135deg, #111827 0%, #1F2937 100%); color: white; position: relative; padding: 24px; }
+        .grand-total-card::after { content: "\f0d6"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; right: -20px; bottom: -30px; font-size: 8rem; color: rgba(255, 255, 255, 0.03); transform: rotate(-15deg); }
+        .grand-total-card h2 { color: var(--premium-gold); font-weight: 800; letter-spacing: -1px; }
+
+        .kpi-card { padding: 20px 24px; }
+        .kpi-value { font-weight: 800; font-size: 1.5rem; margin-top: 8px; margin-bottom: 4px; }
+
+        .table { margin-bottom: 0; }
+        .table thead th { background-color: #F9FAFB; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; border-bottom: 2px solid #E5E7EB; padding: 12px 16px; }
+        .table tbody td { padding: 16px; vertical-align: middle; border-bottom: 1px solid #F3F4F6; font-size: 0.9rem; }
+        
+        .asset-badge { padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; display: inline-block; }
+        .badge-stock { background: #EFF6FF; color: #1D4ED8; }
+        .badge-gold { background: #FEF3C7; color: #B45309; }
+        .badge-usd { background: #ECFDF5; color: #047857; }
+        .badge-safe { background: #F3F4F6; color: #374151; }
+
+        .text-profit { color: var(--success-green) !important; font-weight: 700; }
+        .text-loss { color: var(--danger-red) !important; font-weight: 700; }
+        .numeric { font-variant-numeric: tabular-nums; }
+        .scrollable-list { max-height: 200px; overflow-y: auto; }
+
+        .nav-pills-custom { background-color: #E5E7EB; border-radius: 12px; padding: 4px; display: inline-flex; width: 100%; }
+        .nav-pills-custom .nav-item { flex: 1; text-align: center; }
+        .nav-pills-custom .nav-link { color: var(--text-muted); font-weight: 600; font-size: 0.9rem; border-radius: 8px; padding: 10px 16px; transition: all 0.2s ease; }
+        .nav-pills-custom .nav-link.active { background-color: var(--card-bg); color: var(--bank-navy); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 19, 43, 0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; color: white; }
+
+        /* Custom Input for Allocation */
+        .alloc-input { width: 60px; text-align: center; font-weight: 700; color: var(--bank-navy); border: 1px solid #CBD5E1; border-radius: 6px; padding: 4px; transition: 0.2s; }
+        .alloc-input:focus { border-color: var(--bank-blue); outline: none; box-shadow: 0 0 0 2px rgba(28, 61, 90, 0.2); }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <div class="spinner-border text-warning mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+    <h5 class="fw-bold tracking-wider">ĐANG ĐỒNG BỘ DỮ LIỆU THỊ TRƯỜNG...</h5>
+</div>
+
+<nav class="navbar navbar-dark navbar-premium py-3 mb-4">
+    <div class="container-fluid px-4 px-xl-5">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <i class="fa-solid fa-building-columns fs-4 me-3 text-warning"></i>
+            <div>
+                <div style="font-size: 1.1rem; line-height: 1;">WEALTH PRO</div>
+                <div style="font-size: 0.65rem; font-weight: 500; color: #9CA3AF; letter-spacing: 2px;">ADVANCED ALLOCATION MODE</div>
+            </div>
+        </a>
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-warning fw-bold" onclick="syncMarketAPI()"><i class="fa-solid fa-bolt me-1"></i> Đồng bộ Giá TT</button>
+            <button class="btn btn-sm btn-outline-light" onclick="clearData()"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4 px-xl-5">
+    <div class="row">
+        <!-- CỘT TRÁI -->
+        <div class="col-xl-3 col-lg-4">
+            <div class="card">
+                <div class="card-header"><span><i class="fa-solid fa-wallet text-primary me-2"></i> QUẢN TRỊ DÒNG TIỀN</span></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted mb-1">Ghi nhận Thu nhập</label>
+                        <div class="input-group">
+                            <input type="text" id="incName" class="form-control" placeholder="Tên khoản">
+                            <input type="number" id="incAmount" class="form-control" placeholder="Số tiền" style="max-width: 120px;">
+                            <button class="btn btn-outline-success" onclick="addFlow('inc')"><i class="fa-solid fa-arrow-down"></i></button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted mb-1">Ghi nhận Chi phí</label>
+                        <div class="input-group">
+                            <input type="text" id="expName" class="form-control" placeholder="Tên khoản">
+                            <input type="number" id="expAmount" class="form-control" placeholder="Số tiền" style="max-width: 120px;">
+                            <button class="btn btn-outline-danger" onclick="addFlow('exp')"><i class="fa-solid fa-arrow-up"></i></button>
+                        </div>
+                    </div>
+                    <div class="bg-light rounded p-3 mt-4">
+                        <div class="d-flex justify-content-between small fw-medium mb-2 text-muted"><span>Tổng Thu:</span><span id="totalIncome" class="text-success numeric">0 đ</span></div>
+                        <div class="d-flex justify-content-between small fw-medium mb-2 text-muted"><span>Tổng Chi:</span><span id="totalExpense" class="text-danger numeric">0 đ</span></div>
+                        <hr class="my-2 border-secondary border-opacity-25">
+                        <div class="d-flex justify-content-between align-items-center"><span class="small fw-bold text-dark">DÒNG TIỀN RÒNG</span><span id="netCashFlow" class="fs-5 fw-bold text-primary numeric">0 đ</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-light"><i class="fa-solid fa-briefcase text-warning me-2"></i> MUA TÍCH SẢN TỰ CHỌN</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted mb-1">Lựa chọn Tài sản</label>
+                        <select id="tradeSymbol" class="form-select">
+                            <option value="FPT">Cổ phiếu FPT (Công nghệ)</option>
+                            <option value="HPG">Cổ phiếu HPG (Thép)</option>
+                            <option value="VCB">Cổ phiếu VCB (Ngân hàng)</option>
+                            <option value="MWG">Cổ phiếu MWG (Bán lẻ)</option>
+                            <option value="GMD">Cổ phiếu GMD (Cảng biển)</option>
+                            <option value="SJC">Vàng miếng SJC</option>
+                            <option value="USD">Ngoại tệ USD</option>
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-4">
+                        <div class="col-6"><label class="form-label small fw-bold text-muted mb-1">Khối lượng</label><input type="number" id="tradeQty" class="form-control" placeholder="VD: 100"></div>
+                        <div class="col-6"><label class="form-label small fw-bold text-muted mb-1">Đơn giá (đ)</label><input type="number" id="tradePrice" class="form-control" placeholder="VD: 125000"></div>
+                    </div>
+                    <button class="btn btn-bank w-100" onclick="addManualTrade()">THỰC HIỆN GIAO DỊCH</button>
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="small fw-bold text-muted mb-2"><i class="fa-solid fa-history me-1"></i> Lịch sử khớp lệnh</div>
+                        <div class="scrollable-list small" id="tradeHistoryList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI -->
+        <div class="col-xl-9 col-lg-8">
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card h-100 mb-0 kpi-card">
+                        <div class="small fw-bold text-muted text-uppercase tracking-wider">1. Phân Bổ Tự Động</div>
+                        <div id="kpiAutoValue" class="kpi-value text-primary numeric">0 đ</div>
+                        <div class="small text-muted fw-medium"><i class="fa-solid fa-robot me-1 text-secondary"></i> Tính theo % Dòng tiền</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 mb-0 kpi-card" style="background-color: var(--light-gold);">
+                        <div class="small fw-bold text-muted text-uppercase tracking-wider">2. Tích Sản Chủ Động</div>
+                        <div id="kpiManualValue" class="kpi-value numeric" style="color: #B45309;">0 đ</div>
+                        <div class="small text-muted fw-medium"><i class="fa-solid fa-hand-holding-dollar me-1 text-warning"></i> Tổng vốn tự mua: <span id="kpiManualCapital" class="fw-bold text-dark numeric">0 đ</span></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 mb-0 grand-total-card">
+                        <div class="small fw-bold text-uppercase text-white-50 tracking-wider">Tổng Giá Trị Tài Sản (1 + 2)</div>
+                        <h2 id="kpiGrandTotal" class="numeric my-2">0 đ</h2>
+                        <div class="mt-auto pt-2 border-top border-secondary border-opacity-50 d-flex justify-content-between align-items-center">
+                            <span class="small text-white-50 fw-medium">Lợi nhuận ròng:</span>
+                            <span id="kpiGrandProfit" class="fw-bold numeric" style="color: #34D399;">+ 0 đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <ul class="nav nav-pills-custom" id="portfolioTabs" role="tablist">
+                    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#auto-pane" type="button" role="tab">Tùy chỉnh Tỷ trọng (Auto-Invest)</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#manual-pane" type="button" role="tab">Danh mục Chủ động (Cộng dồn)</button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#cycle-pane" type="button" role="tab">Mô phỏng Lãi Kép 12 Tháng</button></li>
+                </ul>
+            </div>
+
+            <div class="tab-content" id="portfolioTabsContent">
+                <!-- TAB 1: AUTO (CÓ THỂ SỬA TỶ TRỌNG) -->
+                <div class="tab-pane fade show active" id="auto-pane" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>BẢNG PHÂN BỔ DÒNG TIỀN RÒNG</span>
+                            <span id="allocBadge" class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-semibold">Auto-Balanced (100%)</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table numeric">
+                                <thead>
+                                    <tr>
+                                        <th width="15%">Mã Tài sản</th>
+                                        <th width="15%" class="text-center">Tỷ trọng (%)</th>
+                                        <th width="15%" class="text-end">Tiền Phân Bổ (đ)</th>
+                                        <th width="15%" class="text-end">Giá Mua/Gốc</th>
+                                        <th width="15%" class="text-end">Giá Thị Trường</th>
+                                        <th width="15%" class="text-end">Giá trị Hiện tại</th>
+                                        <th width="10%" class="text-end">Lãi/Lỗ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="autoPortfolioTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2 & 3 GIỮ NGUYÊN -->
+                <div class="tab-pane fade" id="manual-pane" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center"><span>SỔ TÀI SẢN TÍCH LŨY (TỰ GIAO DỊCH)</span></div>
+                        <div class="table-responsive">
+                            <table class="table numeric">
+                                <thead><tr><th width="20%">Mã</th><th width="15%" class="text-end">Tổng KL</th><th width="15%" class="text-end">Giá Vốn TB</th><th width="15%" class="text-end">Giá TT</th><th width="15%" class="text-end">Tổng Vốn</th><th width="15%" class="text-end">Giá Trị Hiện Tại</th><th width="5%" class="text-end">Lãi/Lỗ</th></tr></thead>
+                                <tbody id="manualPortfolioTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="cycle-pane" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">DỰ PHÓNG CHU KỲ TĂNG TRƯỞNG 12 THÁNG</div>
+                        <div class="table-responsive">
+                            <table class="table numeric text-center">
+                                <thead><tr><th>Kỳ Hạn</th><th>Vốn Bơm / Tháng</th><th>Lũy Kế Vốn Gốc</th><th>Biến Động TT</th><th class="fw-bold text-dark" style="background-color: #F8FAFC;">Tổng Giá Trị Mô Phỏng</th><th>Hiệu Quả Đầu Tư (Lãi/Lỗ)</th></tr></thead>
+                                <tbody id="monthlyHistoryTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu mặc định
+    const defaultMarket = [
+        { type: 'stock', symbol: "FPT", name: "CTCP FPT", alloc: 0.10, basePrice: 110000, currentPrice: 125000, unit: "CP" },
+        { type: 'stock', symbol: "HPG", name: "Hòa Phát", alloc: 0.10, basePrice: 28000, currentPrice: 26500, unit: "CP" },
+        { type: 'stock', symbol: "VCB", name: "Vietcombank", alloc: 0.10, basePrice: 88000, currentPrice: 91000, unit: "CP" },
+        { type: 'stock', symbol: "MWG", name: "Thế Giới Di Động", alloc: 0.10, basePrice: 45000, currentPrice: 47500, unit: "CP" },
+        { type: 'stock', symbol: "GMD", name: "Gemadept", alloc: 0.10, basePrice: 70000, currentPrice: 74000, unit: "CP" },
+        { type: 'gold', symbol: "SJC", name: "Vàng SJC", alloc: 0.10, basePrice: 8200000, currentPrice: 8750000, unit: "Chỉ" },
+        { type: 'usd', symbol: "USD", name: "Ngoại tệ", alloc: 0.10, basePrice: 24500, currentPrice: 25400, unit: "$" },
+        { type: 'safe', symbol: "SAVINGS", name: "Tiết kiệm", alloc: 0.10, basePrice: 1, currentPrice: 1.0041, unit: "đ" }, 
+        { type: 'safe', symbol: "CASH", name: "Tiền mặt", alloc: 0.20, basePrice: 1, currentPrice: 1, unit: "đ" } 
+    ];
+
+    let incomes = JSON.parse(localStorage.getItem('ft_incomes')) || [{name: "Lương", amount: 45000000}, {name: "Thưởng", amount: 10000000}];
+    let expenses = JSON.parse(localStorage.getItem('ft_expenses')) || [{name: "Chi tiêu", amount: 18000000}];
+    let manualTrades = JSON.parse(localStorage.getItem('ft_trades')) || [];
+    let marketData = JSON.parse(localStorage.getItem('ft_market')) || defaultMarket;
+
+    const monthlyMarketFluctuations = [1.5, -0.8, 2.1, 1.0, -1.5, 3.2, 0.5, 1.8, -1.2, 2.5, 1.5, 2.8]; 
+
+    function formatNum(num) { return new Intl.NumberFormat('vi-VN').format(Math.round(num)); }
+
+    function saveData() {
+        localStorage.setItem('ft_incomes', JSON.stringify(incomes));
+        localStorage.setItem('ft_expenses', JSON.stringify(expenses));
+        localStorage.setItem('ft_trades', JSON.stringify(manualTrades));
+        localStorage.setItem('ft_market', JSON.stringify(marketData));
+        renderAll();
+    }
+
+    function addFlow(type) {
+        const n = document.getElementById(type+'Name').value; const a = parseFloat(document.getElementById(type+'Amount').value);
+        if(n && a) { if(type === 'inc') incomes.push({name: n, amount: a}); else expenses.push({name: n, amount: a});
+            document.getElementById(type+'Name').value = ''; document.getElementById(type+'Amount').value = ''; saveData(); }
+    }
+
+    function addManualTrade() {
+        const s = document.getElementById('tradeSymbol').value; const q = parseFloat(document.getElementById('tradeQty').value); const p = parseFloat(document.getElementById('tradePrice').value);
+        if (!q || !p || q <= 0 || p <= 0) return;
+        manualTrades.push({ symbol: s, qty: q, price: p, date: new Date().toLocaleDateString('vi-VN') });
+        document.getElementById('tradeQty').value = ''; document.getElementById('tradePrice').value = ''; saveData();
+    }
+
+    function clearData() { if(confirm('Khôi phục cài đặt gốc và xóa toàn bộ dữ liệu?')) { localStorage.clear(); location.reload(); } }
+
+    function syncMarketAPI() {
+        document.getElementById('loader').style.display = 'flex';
+        setTimeout(() => {
+            marketData.forEach(item => {
+                if(item.type !== 'safe') item.currentPrice = Math.round(item.currentPrice * (1 + (Math.random() * 0.08 - 0.04)));
+                else if (item.symbol === 'SAVINGS') item.currentPrice += 0.004;
+            });
+            document.getElementById('loader').style.display = 'none'; saveData();
+        }, 1500);
+    }
+
+    // HÀM CẬP NHẬT TỶ TRỌNG KHI NGƯỜI DÙNG SỬA %
+    function updateAlloc(symbol, val) {
+        let pct = parseFloat(val);
+        if(isNaN(pct) || pct < 0) pct = 0;
+        let asset = marketData.find(a => a.symbol === symbol);
+        if(asset) {
+            asset.alloc = pct / 100;
+            saveData();
+        }
+    }
+
+    function renderAll() {
+        // 1. DÒNG TIỀN
+        let totalInc = incomes.reduce((s, i) => s + i.amount, 0), totalExp = expenses.reduce((s, i) => s + i.amount, 0);
+        document.getElementById('totalIncome').innerText = formatNum(totalInc) + ' đ'; document.getElementById('totalExpense').innerText = formatNum(totalExp) + ' đ';
+        const validFlow = (totalInc - totalExp) > 0 ? (totalInc - totalExp) : 0;
+        document.getElementById('netCashFlow').innerText = formatNum(validFlow) + ' đ';
+
+        // 2. TAB 1: DANH MỤC AUTO (VỚI TÍNH NĂNG NHẬP %)
+        let autoHtml = ''; let totalAutoCapital = 0, totalAutoCurrent = 0, totalAllocPct = 0;
+
+        marketData.forEach(asset => {
+            let autoMoney = validFlow * asset.alloc;
+            let currentVal = autoMoney * (asset.currentPrice / asset.basePrice);
+            let profitAmt = currentVal - autoMoney;
+            
+            totalAutoCapital += autoMoney; totalAutoCurrent += currentVal;
+            totalAllocPct += (asset.alloc * 100);
+
+            let tClass = asset.type === 'stock' ? 'badge-stock' : (asset.type === 'gold' ? 'badge-gold' : (asset.type === 'usd' ? 'badge-usd' : 'badge-safe'));
+            
+            autoHtml += `
+                <tr>
+                    <td><div class="asset-badge ${tClass}">${asset.symbol}</div><div class="small text-muted mt-1 fw-medium" style="font-size: 0.75rem">${asset.name}</div></td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <input type="number" class="alloc-input" value="${+(asset.alloc * 100).toFixed(2)}" onchange="updateAlloc('${asset.symbol}', this.value)" step="1" min="0">
+                            <span class="ms-1 fw-bold text-muted">%</span>
+                        </div>
+                    </td>
+                    <td class="text-end fw-bold text-dark">${formatNum(autoMoney)}</td>
+                    <td class="text-end text-muted">${asset.type === 'safe' ? '-' : formatNum(asset.basePrice)}</td>
+                    <td class="text-end fw-medium">${asset.type === 'safe' ? '-' : formatNum(asset.currentPrice)}</td>
+                    <td class="text-end fw-bold" style="color: var(--bank-navy)">${formatNum(currentVal)}</td>
+                    <td class="text-end ${profitAmt >= 0 ? 'text-profit' : 'text-loss'}"><div>${profitAmt > 0 ? '+' : ''}${formatNum(profitAmt)}</div></td>
+                </tr>
+            `;
+        });
+        document.getElementById('autoPortfolioTable').innerHTML = autoHtml;
+        document.getElementById('kpiAutoValue').innerText = formatNum(totalAutoCurrent) + ' đ';
+
+        // Cập nhật Cảnh báo Tổng phần trăm
+        let badge = document.getElementById('allocBadge');
+        if (Math.round(totalAllocPct) !== 100) {
+            badge.className = "badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2 fw-semibold";
+            badge.innerText = `CẢNH BÁO: ĐANG CHIA ${Math.round(totalAllocPct)}%`;
+        } else {
+            badge.className = "badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-semibold";
+            badge.innerText = "Cân bằng vốn (100%)";
+        }
+
+        // 3. SỔ LỆNH & MANUAL PORTFOLIO
+        let txHtml = ''; let manualPort = {}; let totalManCap = 0, totalManCur = 0;
+        [...manualTrades].reverse().forEach(t => {
+            txHtml += `<div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-light"><div><span class="fw-bold text-dark">${t.symbol}</span> <span class="text-muted ms-1" style="font-size: 0.7rem">${t.date}</span></div><div class="text-end fw-bold text-success">+${formatNum(t.qty)} <span class="fw-normal text-muted small ms-1">@ ${formatNum(t.price)}</span></div></div>`;
+        });
+        document.getElementById('tradeHistoryList').innerHTML = txHtml || '<div class="text-muted text-center my-3">Sổ lệnh trống</div>';
+
+        manualTrades.forEach(t => {
+            if (!manualPort[t.symbol]) manualPort[t.symbol] = { qty: 0, cost: 0 };
+            manualPort[t.symbol].qty += t.qty; manualPort[t.symbol].cost += (t.qty * t.price);
+        });
+
+        let manHtml = '';
+        for (let sym in manualPort) {
+            let data = manualPort[sym], ref = marketData.find(a => a.symbol === sym);
+            let avgPrice = data.cost / data.qty, currentVal = data.qty * ref.currentPrice, profitAmt = currentVal - data.cost;
+            totalManCap += data.cost; totalManCur += currentVal;
+
+            manHtml += `
+                <tr>
+                    <td><div class="asset-badge ${ref.type === 'stock' ? 'badge-stock' : 'badge-gold'}">${sym}</div></td>
+                    <td class="text-end fw-bold text-dark">${formatNum(data.qty)}</td>
+                    <td class="text-end fw-medium">${formatNum(avgPrice)}</td>
+                    <td class="text-end fw-medium">${formatNum(ref.currentPrice)}</td>
+                    <td class="text-end text-muted">${formatNum(data.cost)}</td>
+                    <td class="text-end fw-bold" style="color: #B45309">${formatNum(currentVal)}</td>
+                    <td class="text-end ${profitAmt >= 0 ? 'text-profit' : 'text-loss'}">${profitAmt > 0 ? '+' : ''}${formatNum(profitAmt)}</td>
+                </tr>
+            `;
+        }
+        document.getElementById('manualPortfolioTable').innerHTML = manHtml || '<tr><td colspan="7" class="text-center text-muted py-5">Danh mục trống.</td></tr>';
+        document.getElementById('kpiManualCapital').innerText = formatNum(totalManCap) + ' đ'; document.getElementById('kpiManualValue').innerText = formatNum(totalManCur) + ' đ';
+
+        // 4. GRAND TOTAL
+        let grandVal = totalAutoCurrent + totalManCur, grandCap = totalAutoCapital + totalManCap, grandProf = grandVal - grandCap;
+        document.getElementById('kpiGrandTotal').innerText = formatNum(grandVal) + ' VNĐ';
+        document.getElementById('kpiGrandProfit').innerText = `${grandProf >= 0 ? '+' : ''} ${formatNum(grandProf)} VNĐ`;
+        document.getElementById('kpiGrandProfit').style.color = grandProf >= 0 ? '#34D399' : '#F87171';
+
+        // 5. CYCLE SIMULATION
+        let simHtml = ''; let accCap = 0; let accVal = 0;
+        if(validFlow === 0) { document.getElementById('monthlyHistoryTable').innerHTML = '<tr><td colspan="6" class="text-muted py-4">Dòng tiền ròng bằng 0.</td></tr>'; return; }
+        for (let i = 0; i < 12; i++) {
+            accCap += validFlow; accVal = (accVal * (1 + (monthlyMarketFluctuations[i] / 100))) + validFlow; 
+            let totalPnL = accVal - accCap;
+            simHtml += `<tr><td class="fw-bold" style="color: var(--bank-navy)">Tháng ${i + 1}</td><td class="text-muted">+${formatNum(validFlow)}</td><td class="fw-medium">${formatNum(accCap)}</td><td class="${monthlyMarketFluctuations[i] > 0 ? 'text-profit' : 'text-loss'} fw-bold">${monthlyMarketFluctuations[i] > 0 ? '+' : ''}${monthlyMarketFluctuations[i]}%</td><td class="fw-bold text-dark" style="background-color: #F8FAFC;">${formatNum(accVal)}</td><td class="${totalPnL > 0 ? 'text-profit' : 'text-loss'} fw-medium">${totalPnL > 0 ? '+' : ''}${formatNum(totalPnL)}</td></tr>`;
+        }
+        document.getElementById('monthlyHistoryTable').innerHTML = simHtml;
+    }
+    renderAll();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
